@@ -468,8 +468,8 @@ public class PartitionAlgorithm extends AbstractLayout implements
 				response = JOptionPane
 						.showConfirmDialog(
 								(java.awt.Window) taskMonitor,
-								"Building over "
-										+ SUBNETWORK_COUNT_WARNING
+								"Building "
+										+ nodeAttributeValues.size()
 										+ " subnetworks may take a while. Are you sure you want to proceed?",
 								"Warning", JOptionPane.YES_NO_OPTION);
 			}
