@@ -19,6 +19,7 @@ import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.NodeShape;
 import cytoscape.visual.VisualMappingManager;
 import cytoscape.visual.VisualPropertyType;
+import cytoscape.visual.VisualPropertyDependency;
 import cytoscape.visual.VisualStyle;
 import cytoscape.visual.calculators.BasicCalculator;
 import cytoscape.visual.calculators.Calculator;
@@ -55,7 +56,7 @@ public class PartitionNetworkVisualStyleFactory {
 			mfStyle.setName(attributeName);
 			NodeAppearanceCalculator nac = new MFNodeAppearanceCalculator();
 			EdgeAppearanceCalculator eac = new MFEdgeAppearanceCalculator();
-			nac.getDefaultAppearance().setNodeSizeLocked(false);
+			mfStyle.getDependency().set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED, false);
 			nac.getDefaultAppearance().set(VisualPropertyType.NODE_HEIGHT,
 					MFNodeAppearanceCalculator.FEATURE_NODE_HEIGHT);
 			nac.getDefaultAppearance().set(VisualPropertyType.NODE_WIDTH,
