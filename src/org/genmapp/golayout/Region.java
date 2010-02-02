@@ -100,6 +100,7 @@ public class Region extends JComponent implements ViewportChangeListener {
 		RegionManager.addRegion(this.attValue, this);
 
 		// synonym terms based on Nathan's GO tree analysis
+		//TODO: this should all be in a lexicon file
 		if (this.attValue.equals("extracellular region"))
 			nestedAttValues = Arrays.asList("extracellular region",
 					"extracellular space", "secreted");
