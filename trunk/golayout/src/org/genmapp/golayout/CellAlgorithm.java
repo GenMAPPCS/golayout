@@ -951,10 +951,11 @@ public class CellAlgorithm extends AbstractLayout {
 		while (it.hasNext()) {
 			Node node = (Node) it.next();
 			String val = null;
+			List<Object> valList = new ArrayList<Object>();
 			String terms[] = new String[1];
 			// add support for parsing List type attributes
 			if (attribs.getType(attributeName) == CyAttributes.TYPE_SIMPLE_LIST) {
-				List<Object> valList = attribs.getListAttribute(node
+				 valList = attribs.getListAttribute(node
 						.getIdentifier(), attributeName);
 				// iterate through all elements in the list
 				if (valList != null && valList.size() > 0) {
@@ -978,7 +979,7 @@ public class CellAlgorithm extends AbstractLayout {
 				for (Object o : r.getNestedAttValues()) {
 					if (val.indexOf(o.toString()) >= 0) {
 						if (r.getAttValue().equals("unassigned")
-								&& val.length() > 1) {
+								&& valList.indexOf(val) < valList.size() - 1) {
 							break; // skip to next, more specific, value
 						} else {
 							nvList.add(Cytoscape.getCurrentNetworkView()

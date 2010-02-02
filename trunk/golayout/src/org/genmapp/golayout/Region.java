@@ -103,7 +103,7 @@ public class Region extends JComponent implements ViewportChangeListener {
 		//TODO: this should all be in a lexicon file
 		if (this.attValue.equals("extracellular region"))
 			nestedAttValues = Arrays.asList("extracellular region",
-					"extracellular space", "secreted");
+					"extracellular space", "secreted", "cytoskeleton", "extracellular");
 		else if (this.attValue.equals("mitochondrion"))
 			nestedAttValues = Arrays.asList("mitochondrion",
 					"mitochondrion lumen");
@@ -119,7 +119,7 @@ public class Region extends JComponent implements ViewportChangeListener {
 			nestedAttValues = Arrays.asList("nucleus", "nucleolus",
 					"nuclear membrane", "nucleoplasm");
 		else if (this.attValue.equals("unassigned"))
-			nestedAttValues = Arrays.asList("unassigned", "cellular_component");
+			nestedAttValues = Arrays.asList("unassigned", "cellular_component", "cellular component unknown");
 		else
 			nestedAttValues = Arrays.asList(this.attValue);
 
