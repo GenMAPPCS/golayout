@@ -1,13 +1,10 @@
 package org.genmapp.golayout;
 
 import giny.model.Node;
-import giny.view.NodeView;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.TreeMap;
 
 import cytoscape.Cytoscape;
@@ -27,6 +24,9 @@ public class RegionManager {
 	public static void addRegion(String attValue, Region region) {
 		regionAttMap.put(attValue, region);
 		checkForOverlap(region);
+		DGraphView dview = (DGraphView) Cytoscape.getCurrentNetworkView();
+		DingCanvas backgroundLayer = dview.getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS);
+		backgroundLayer.add(region, 0);
 	}
 
 	public static Region getRegionByAtt(String attValue) {
