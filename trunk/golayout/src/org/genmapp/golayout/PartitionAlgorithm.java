@@ -43,7 +43,7 @@ public class PartitionAlgorithm extends AbstractLayout implements
 	protected static String layoutName = "force-directed";
 	private ArrayList<Object> nodeAttributeValues = new ArrayList();
 	// private Object[] layoutNames = null;
-	protected static String attributeName = "annotation.GO BIOLOGICAL_PROCESS";
+	protected static String attributeName = GOLayout.BP_ATTNAME;
 	private HashMap<Object, List<CyNode>> attributeValueNodeMap;
 	private List<CyNetworkView> views = new ArrayList<CyNetworkView>();
 	private List<CyGroup> groups = new ArrayList<CyGroup>();

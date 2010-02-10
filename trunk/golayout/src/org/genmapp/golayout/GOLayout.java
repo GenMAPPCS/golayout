@@ -6,12 +6,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
@@ -29,13 +27,18 @@ import cytoscape.layout.CyLayoutAlgorithm;
 import cytoscape.layout.CyLayouts;
 import cytoscape.layout.LayoutProperties;
 import cytoscape.layout.Tunable;
+import cytoscape.layout.TunableListener;
 import cytoscape.plugin.CytoscapePlugin;
 import cytoscape.view.CyNetworkView;
 
 public class GOLayout extends CytoscapePlugin {
 
-	IDMapper _mapper = null;
-
+	protected static final String CC_ATTNAME = "annotation.GOSlim CELLULAR_COMPONENT";
+	protected static final String BP_ATTNAME = "annotation.GOSlim BIOLOGICAL_PROCESS";
+	protected static final String MF_ATTNAME = "annotation.GOSlim MOLECULAR_FUNCTION";
+	protected static final String CC_CODE = "Tc";
+	protected static final String BP_CODE = "Tb";
+	protected static final String MF_CODE = "Tm";
 
 	/**
 	 * The constructor registers our layout algorithm. The CyLayouts mechanism
@@ -47,91 +50,12 @@ public class GOLayout extends CytoscapePlugin {
 		CyLayouts.addLayout(new PartitionAlgorithm(), null);
 		CyLayouts.addLayout(new CellAlgorithm(), null);
 
-		JMenuItem item = new JMenuItem("Add GO-slim annotations");
-		JMenu layoutMenu = Cytoscape.getDesktop().getCyMenus().getMenuBar()
-				.getMenu("Layout");
-		item.addActionListener(new AddAnnotationCommandListener());
-
-		layoutMenu.add(item);
-	}
-
-	// Handles the top-level menu selection event from Cytoscape
-	public class AddAnnotationCommandListener implements ActionListener {
-
-		public AddAnnotationCommandListener() {
-
-		}
-
-		public void actionPerformed(ActionEvent evt_) {
-			setupBridgeDB(GOLayoutAlgorithm.annotationAtt,
-					GOLayoutAlgorithm.annotationCode,
-					GOLayoutAlgorithm.annotationSpecies);
-		}
-
-		public void setupBridgeDB(String annAtt, String annCode,
-				String annSpecies) {
-
-			DataSource annDs = DataSource.getByFullName(annCode);
-
-			try {
-				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
-			} catch (ClassNotFoundException e) {
-				System.out
-						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
-				e.printStackTrace();
-			}
-
-			BioDataSource.init();
-			// now we connect to the driver and create a IDMapper instance.
-			// TODO: Update to use multiple species
-			try {
-				_mapper = BridgeDb
-						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
-								+ annSpecies);
-			} catch (IDMapperException e) {
-				e.printStackTrace();
-			}  
-			System.out.println("ID Mapper = " + _mapper);
-			System.out.println("ID Mapper capabilites = "
-					+ _mapper.getCapabilities());
-
-			CyAttributes attrs = Cytoscape.getNodeAttributes();
-			Xref inXref = null;
-
-			Iterator<Node> it = Cytoscape.getCurrentNetwork().nodesIterator();
-			while (it.hasNext()) {
-				Node n = it.next();
-				String inputID = (String) Cytoscape.getNodeAttributes()
-						.getAttribute(n.getIdentifier(), annAtt);
-				if (null == inputID){
-					continue;
-				}
-
-				System.out.println("in: "+ inputID + " ds: "+ annDs + " full: "+annDs.getFullName());
-				inXref = new Xref(inputID, annDs);
-
-				Set<Xref> outRefs = null;
-				try {
-					outRefs = _mapper
-							.mapID(inXref, BioDataSource.GENE_ONTOLOGY);
-					// TODO: make 3 calls for each of the GO-Slims
-				} catch (IDMapperException e) {
-					System.out
-							.println("Got ID mapper exception trying to get mappings");
-				}
-				System.out.println("Got mappings: " + outRefs);
-				if (outRefs != null) {
-					List<String> attrList = new ArrayList<String>();
-					for (Xref outXref : outRefs) {
-						attrList.add(outXref.getId());
-					}
-					Cytoscape.getNodeAttributes().setListAttribute(
-							n.getIdentifier(), "annotation.FutureGOSlim",
-							attrList);
-				}
-
-			}
-		}
+		// JMenuItem item = new JMenuItem("Add GO-slim annotations");
+		// JMenu layoutMenu = Cytoscape.getDesktop().getCyMenus().getMenuBar()
+		// .getMenu("Layout");
+		// item.addActionListener(new AddAnnotationCommandListener());
+		//
+		// layoutMenu.add(item);
 	}
 
 	public static void createVisualStyle(CyNetworkView view) {
@@ -139,63 +63,74 @@ public class GOLayout extends CytoscapePlugin {
 
 	}
 
-	public static class GOLayoutAlgorithm extends AbstractLayout {
+	public class GOLayoutAlgorithm extends AbstractLayout implements
+			TunableListener {
 
 		protected static final String LAYOUT_NAME = "0-golayout";
-		LayoutProperties layoutProperties = null;
 		private static final String HELP = "GOLayout Help";
+		private LayoutProperties layoutProperties = null;
 
-		public static String annotationAtt = "entrezgene-id";
-		public static String annotationCode = null;
-		public static String annotationSpecies = null;
-		private List<String> codeValues = new ArrayList<String>();
+		public String annotationAtt = "canonicalName";
+		public String annotationCode = null;
+		public String annotationSpecies = "Human";
+		private List<String> dsValues = new ArrayList<String>();
 		private List<String> speciesValues = new ArrayList<String>();
+		private IDMapper _mapper = null;
+		private Set<DataSource> dataSources = null;
+		private Tunable dsTunable;
 
-		
 		/**
 		 * Creates a new CellularLayoutAlgorithm object.
 		 */
 		public GOLayoutAlgorithm() {
 			super();
-			
-			
 
-			codeValues.add(BioDataSource.ENTREZ_GENE.getFullName());
-			codeValues.add(BioDataSource.ENSEMBL_HUMAN.getFullName());
+			// hardcode species until web service support query of supported
+			// species
 			speciesValues.add("Human");
 			speciesValues.add("Mouse");
+			speciesValues.add("Zebra fish");
+			speciesValues.add("Fruit fly");
+			speciesValues.add("Worm");
 			speciesValues.add("Yeast");
-			
+
+			// dynamically populate list of datasource names
+			populateDataSourceList();
+
 			layoutProperties = new LayoutProperties(getName());
 			layoutProperties.add(new Tunable("global", "Global Settings",
 					Tunable.GROUP, new Integer(3)));
 			layoutProperties.add(new Tunable("attributePartition",
 					"The attribute to use for partitioning",
 					Tunable.NODEATTRIBUTE, PartitionAlgorithm.attributeName,
-					(Object) getInitialAttributeList(), (Object) null, 0));
+					(Object) getInitialAttributeList(BP_ATTNAME),
+					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeLayout",
 					"The attribute to use for the layout",
 					Tunable.NODEATTRIBUTE, CellAlgorithm.attributeName,
-					(Object) getInitialAttributeList(), (Object) null, 0));
+					(Object) getInitialAttributeList(CC_ATTNAME),
+					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeNodeColor",
 					"The attribute to use for node color",
 					Tunable.NODEATTRIBUTE,
 					PartitionNetworkVisualStyleFactory.attributeName,
-					(Object) getInitialAttributeList(), (Object) null, 0));
+					(Object) getInitialAttributeList(MF_ATTNAME),
+					(Object) null, 0));
 			layoutProperties.add(new Tunable("annotation",
 					"Annotation Settings", Tunable.GROUP, new Integer(3)));
 			layoutProperties.add(new Tunable("attributeAnnotation",
 					"The attribute to use for adding annotations",
 					Tunable.NODEATTRIBUTE, annotationAtt,
-					(Object) getInitialAttributeList(), (Object) null, 0));
-			layoutProperties.add(new Tunable("codeAnnotation",
+					(Object) getInitialAttributeList(null), (Object) null, 0));
+			Tunable t = new Tunable("speciesAnnotation", "Species",
+					Tunable.LIST, new Integer(0), (Object) speciesValues
+							.toArray(), null, 0);
+			t.addTunableValueListener(this);
+			layoutProperties.add(t);
+			dsTunable = new Tunable("dsAnnotation",
 					"Type of identifier, e.g., Entrez Gene", Tunable.LIST,
-					new Integer(0), (Object) codeValues.toArray(),
-					null, 0));
-			layoutProperties.add(new Tunable("speciesAnnotation",
-					"Species", Tunable.LIST,
-					new Integer(0), (Object) speciesValues.toArray(),
-					null, 0));
+					new Integer(0), (Object) dsValues.toArray(), null, 0);
+			layoutProperties.add(dsTunable);
 			layoutProperties.add(new Tunable("partition", "Partition Settings",
 					Tunable.GROUP, new Integer(2)));
 			layoutProperties.add(new Tunable("partitionMin",
@@ -231,6 +166,52 @@ public class GOLayout extends CytoscapePlugin {
 			getHelp.addActionListener(getHelpListener);
 			Cytoscape.getDesktop().getCyMenus().getHelpMenu().add(getHelp);
 
+		}
+
+		public void populateDataSourceList() {
+			try {
+				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
+			} catch (ClassNotFoundException e) {
+				System.out
+						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
+				e.printStackTrace();
+			}
+
+			BioDataSource.init();
+			// now we connect to the driver and create a IDMapper instance.
+			// TODO: Update to use multiple species
+			try {
+				_mapper = BridgeDb
+						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
+								+ annotationSpecies);
+			} catch (IDMapperException e) {
+				e.printStackTrace();
+			}
+			try {
+				dataSources = _mapper.getCapabilities()
+						.getSupportedSrcDataSources();
+			} catch (IDMapperException e) {
+				e.printStackTrace();
+			}
+			dsValues.clear();
+			if (dataSources.size() > 0) {
+				Iterator it = dataSources.iterator();
+				while (it.hasNext()) {
+					dsValues.add(((DataSource) it.next()).getFullName());
+				}
+
+			}
+
+		}
+
+		public void tunableChanged(Tunable t) {
+			// TODO Auto-generated method stub
+			if (t.getName().equals("speciesAnnotation")) {
+				updateSettings();
+				populateDataSourceList(); // refresh list
+				dsTunable.setLowerBound(dsValues.toArray()); // and reset
+																// tunable
+			}
 		}
 
 		/**
@@ -279,23 +260,23 @@ public class GOLayout extends CytoscapePlugin {
 			}
 
 			t = layoutProperties.get("attributeAnnotation");
-			if ((t != null) && (t.valueChanged() || force)){
+			if ((t != null) && (t.valueChanged() || force)) {
 				String newValue = (String) t.getValue();
 				annotationAtt = newValue;
 			}
-			
-			t = layoutProperties.get("codeAnnotation");
-			if ((t != null) && (t.valueChanged() || force)){
-				String newValue = codeValues.get((Integer) t.getValue());
-				annotationCode = newValue;
-			}
-			
+
 			t = layoutProperties.get("speciesAnnotation");
-			if ((t != null) && (t.valueChanged() || force)){
+			if ((t != null) && (t.valueChanged() || force)) {
 				String newValue = speciesValues.get((Integer) t.getValue());
 				annotationSpecies = newValue;
 			}
-			
+
+			t = layoutProperties.get("dsAnnotation");
+			if ((t != null) && (t.valueChanged() || force)) {
+				String newValue = dsValues.get((Integer) t.getValue());
+				annotationCode = newValue;
+			}
+
 			t = layoutProperties.get("partitionMin");
 			if ((t != null) && (t.valueChanged() || force))
 				PartitionAlgorithm.NETWORK_LIMIT_MIN = ((Integer) t.getValue())
@@ -405,9 +386,14 @@ public class GOLayout extends CytoscapePlugin {
 		 * 
 		 * @returns List of our "special" weights
 		 */
-		public List<String> getInitialAttributeList() {
+		public List<String> getInitialAttributeList(String attName) {
 			ArrayList<String> attList = new ArrayList<String>();
 			attList.add("(none)");
+			// also add special GOSlim attribute names to trigger
+			// auto-annotation
+			if (null != attName) {
+				attList.add(attName);
+			}
 
 			return attList;
 		}
@@ -416,12 +402,115 @@ public class GOLayout extends CytoscapePlugin {
 		 * The layout protocol...
 		 */
 		public void construct() {
+			// Check to see if annotations are present
+			String[] attNames = Cytoscape.getNodeAttributes()
+					.getAttributeNames();
+			boolean ccPresent = false;
+			boolean bpPresent = false;
+			boolean mfPresent = false;
+			for (int i = 0; i < attNames.length; i++) {
+				if (attNames[i] == CC_ATTNAME) {
+					ccPresent = true;
+				} else if (attNames[i] == BP_ATTNAME) {
+					bpPresent = true;
+				} else if (attNames[i] == MF_ATTNAME) {
+					mfPresent = true;
+				}
+			}
+			// Fetch annotations if they are needed
+			if (CC_ATTNAME == CellAlgorithm.attributeName && !ccPresent) {
+				setupBridgeDB(CC_CODE, CC_ATTNAME, annotationAtt,
+						annotationCode, annotationSpecies);
+			}
+			if (BP_ATTNAME == PartitionAlgorithm.attributeName && !bpPresent) {
+				setupBridgeDB(BP_CODE, BP_ATTNAME, annotationAtt,
+						annotationCode, annotationSpecies);
+			}
+			if (MF_ATTNAME == PartitionNetworkVisualStyleFactory.attributeName
+					&& !mfPresent) {
+				setupBridgeDB(MF_CODE, MF_ATTNAME, annotationAtt,
+						annotationCode, annotationSpecies);
+			}
+
 			if (null != CellAlgorithm.attributeName) {
 				PartitionAlgorithm.layoutName = CellAlgorithm.LAYOUT_NAME;
 			}
 			CyLayoutAlgorithm layout = CyLayouts.getLayout("partition");
 			layout.doLayout(Cytoscape.getCurrentNetworkView(), taskMonitor);
 		}
+
+		/**
+		 * This method connects to the BridgeDb web service and manages all the
+		 * transactions through to setting node attributes.
+		 * 
+		 * @param code
+		 * @param attname
+		 * @param annAtt
+		 * @param annCode
+		 * @param annSpecies
+		 */
+		public void setupBridgeDB(String code, String attname, String annAtt,
+				String annCode, String annSpecies) {
+
+			DataSource annDs = DataSource.getByFullName(annCode);
+
+			try {
+				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
+			} catch (ClassNotFoundException e) {
+				System.out
+						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
+				e.printStackTrace();
+			}
+
+			BioDataSource.init();
+			// now we connect to the driver and create a IDMapper instance.
+			// TODO: Update to use multiple species
+			try {
+				_mapper = BridgeDb
+						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
+								+ annSpecies);
+			} catch (IDMapperException e) {
+				e.printStackTrace();
+			}
+			System.out.println("ID Mapper = " + _mapper);
+			System.out.println("ID Mapper capabilites = "
+					+ _mapper.getCapabilities());
+
+			CyAttributes attrs = Cytoscape.getNodeAttributes();
+			Xref inXref = null;
+
+			Iterator<Node> it = Cytoscape.getCurrentNetwork().nodesIterator();
+			while (it.hasNext()) {
+				Node n = it.next();
+				String inputID = (String) Cytoscape.getNodeAttributes()
+						.getAttribute(n.getIdentifier(), annAtt);
+				if (null == inputID) {
+					continue;
+				}
+
+				inXref = new Xref(inputID, annDs);
+
+				Set<Xref> outXrefs = null;
+				try {
+					outXrefs = _mapper.mapID(inXref, DataSource
+							.getBySystemCode(code));
+				} catch (IDMapperException e) {
+					System.out
+							.println("Got ID mapper exception trying to get mappings");
+				}
+				System.out.println("Got mappings: " + outXrefs);
+				if (outXrefs != null) {
+					List<String> att = new ArrayList<String>();
+					for (Xref xref : outXrefs) {
+						att.add(xref.getId());
+					}
+					Cytoscape.getNodeAttributes().setListAttribute(
+							n.getIdentifier(), attname, att);
+				}
+
+			}
+		}
+
 	}
 }
 
