@@ -117,12 +117,12 @@ public class GOLayout extends CytoscapePlugin {
 					(Object) getInitialAttributeList(MF_ATTNAME),
 					(Object) null, 0));
 			layoutProperties.add(new Tunable("annotation",
-					"Annotation Settings", Tunable.GROUP, new Integer(3)));
+					"Annotation Settings (optional)", Tunable.GROUP, new Integer(3)));
 			layoutProperties.add(new Tunable("attributeAnnotation",
-					"The attribute to use for adding annotations",
+					"The identifier to use for annotation retrieval",
 					Tunable.NODEATTRIBUTE, annotationAtt,
 					(Object) getInitialAttributeList(null), (Object) null, 0));
-			Tunable t = new Tunable("speciesAnnotation", "Species",
+			Tunable t = new Tunable("speciesAnnotation", "Species of identifier",
 					Tunable.LIST, new Integer(0), (Object) speciesValues
 							.toArray(), null, 0);
 			t.addTunableValueListener(this);
