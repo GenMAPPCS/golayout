@@ -111,7 +111,7 @@ public class Region extends JComponent implements ViewportChangeListener {
 			nestedAttValues = Arrays.asList("endoplasmic reticulum",
 					"Golgi apparatus");
 		else if (this.attValue.equals("plasma membrane"))
-			nestedAttValues = Arrays.asList("plasma membrane", "cell wall");
+			nestedAttValues = Arrays.asList("plasma membrane", "cell wall", "membrane");
 		else if (this.attValue.equals("cytoplasm"))
 			nestedAttValues = Arrays.asList("cytoplasm", "intracellular",
 					"cytosol", "vacuole", "lysosome", "peroxisome");

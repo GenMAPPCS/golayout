@@ -36,7 +36,7 @@ public class PartitionNetworkVisualStyleFactory {
 	/**
 	 * 
 	 */
-	protected static String attributeName = "annotation.GO MOLECULAR_FUNCTION";
+	protected static String attributeName = GOLayout.MF_ATTNAME;
 
 	private static LabelPosition lp = new LabelPosition();
 	public static DiscreteMapping disMappingLabelPosition = new DiscreteMapping(
