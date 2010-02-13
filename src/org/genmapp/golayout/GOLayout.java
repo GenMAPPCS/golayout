@@ -487,6 +487,9 @@ public class GOLayout extends CytoscapePlugin {
 				if (null == inputID) {
 					continue;
 				}
+				if ("Sym" == annCode && "Human" == annSpecies){
+					inputID = inputID.toUpperCase();
+				}
 
 				inXref = new Xref(inputID, annDs);
 
