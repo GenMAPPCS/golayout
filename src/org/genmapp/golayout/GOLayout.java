@@ -41,9 +41,9 @@ import cytoscape.view.CyNetworkView;
 
 public class GOLayout extends CytoscapePlugin {
 
-	protected static final String CC_ATTNAME = "annotation.GOSlim CELLULAR_COMPONENT";
-	protected static final String BP_ATTNAME = "annotation.GOSlim BIOLOGICAL_PROCESS";
-	protected static final String MF_ATTNAME = "annotation.GOSlim MOLECULAR_FUNCTION";
+	protected static final String CC_ATTNAME = "annotation.GO CELLULAR_COMPONENT";
+	protected static final String BP_ATTNAME = "annotation.GO BIOLOGICAL_PROCESS";
+	protected static final String MF_ATTNAME = "annotation.GO MOLECULAR_FUNCTION";
 	protected static final String CC_CODE = "Tc";
 	protected static final String BP_CODE = "Tb";
 	protected static final String MF_CODE = "Tm";
