@@ -113,18 +113,18 @@ public class GOLayout extends CytoscapePlugin {
 			layoutProperties.add(new Tunable("attributePartition",
 					"The attribute to use for partitioning",
 					Tunable.NODEATTRIBUTE, PartitionAlgorithm.attributeName,
-					(Object) getInitialAttributeList(BP_ATTNAME),
+					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeLayout",
 					"The attribute to use for the layout",
 					Tunable.NODEATTRIBUTE, CellAlgorithm.attributeName,
-					(Object) getInitialAttributeList(CC_ATTNAME),
+					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeNodeColor",
 					"The attribute to use for node color",
 					Tunable.NODEATTRIBUTE,
 					PartitionNetworkVisualStyleFactory.attributeName,
-					(Object) getInitialAttributeList(MF_ATTNAME),
+					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 //			layoutProperties.add(new Tunable("annotation",
 //					"Annotation Settings (optional)", Tunable.GROUP, new Integer(3)));
@@ -396,14 +396,14 @@ public class GOLayout extends CytoscapePlugin {
 		 * 
 		 * @returns List of our "special" weights
 		 */
-		public List<String> getInitialAttributeList(String attName) {
+		public List<String> getInitialAttributeList() {
 			ArrayList<String> attList = new ArrayList<String>();
 			attList.add("(none)");
 			// also add special GOSlim attribute names to trigger
 			// auto-annotation
-			if (null != attName) {
-				attList.add(attName);
-			}
+//			if (null != attName) {
+//				attList.add(attName);
+//			}
 
 			return attList;
 		}
@@ -413,20 +413,20 @@ public class GOLayout extends CytoscapePlugin {
 		 */
 		public void construct() {
 			// Check to see if annotations are present
-			String[] attNames = Cytoscape.getNodeAttributes()
-					.getAttributeNames();
-			boolean ccPresent = false;
-			boolean bpPresent = false;
-			boolean mfPresent = false;
-			for (int i = 0; i < attNames.length; i++) {
-				if (attNames[i] == CC_ATTNAME) {
-					ccPresent = true;
-				} else if (attNames[i] == BP_ATTNAME) {
-					bpPresent = true;
-				} else if (attNames[i] == MF_ATTNAME) {
-					mfPresent = true;
-				}
-			}
+//			String[] attNames = Cytoscape.getNodeAttributes()
+//					.getAttributeNames();
+//			boolean ccPresent = false;
+//			boolean bpPresent = false;
+//			boolean mfPresent = false;
+//			for (int i = 0; i < attNames.length; i++) {
+//				if (attNames[i] == CC_ATTNAME) {
+//					ccPresent = true;
+//				} else if (attNames[i] == BP_ATTNAME) {
+//					bpPresent = true;
+//				} else if (attNames[i] == MF_ATTNAME) {
+//					mfPresent = true;
+//				}
+//			}
 			// Fetch annotations if they are needed
 //			if (CC_ATTNAME == CellAlgorithm.attributeName && !ccPresent) {
 //				setupBridgeDB(CC_CODE, CC_ATTNAME, annotationAtt,
