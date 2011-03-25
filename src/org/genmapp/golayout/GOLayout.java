@@ -28,13 +28,6 @@ import java.util.Set;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import org.bridgedb.BridgeDb;
-import org.bridgedb.DataSource;
-import org.bridgedb.IDMapper;
-import org.bridgedb.IDMapperException;
-import org.bridgedb.Xref;
-import org.bridgedb.bio.BioDataSource;
-
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
 import cytoscape.layout.AbstractLayout;
@@ -89,11 +82,11 @@ public class GOLayout extends CytoscapePlugin {
 
 		public String annotationAtt = "canonicalName";
 		public String annotationCode = null;
-		public String annotationSpecies = "Human";
-		private List<String> dsValues = new ArrayList<String>();
-		private List<String> speciesValues = new ArrayList<String>();
-		private IDMapper _mapper = null;
-		private Set<DataSource> dataSources = null;
+//		public String annotationSpecies = "Human";
+//		private List<String> dsValues = new ArrayList<String>();
+//		private List<String> speciesValues = new ArrayList<String>();
+//		private IDMapper _mapper = null;
+//		private Set<DataSource> dataSources = null;
 		private Tunable dsTunable;
 
 		/**
@@ -104,15 +97,15 @@ public class GOLayout extends CytoscapePlugin {
 
 			// hardcode species until web service support query of supported
 			// species
-			speciesValues.add("Human");
-			speciesValues.add("Mouse");
-			speciesValues.add("Zebra fish");
-			speciesValues.add("Fruit fly");
-			speciesValues.add("Worm");
-			speciesValues.add("Yeast");
+//			speciesValues.add("Human");
+//			speciesValues.add("Mouse");
+//			speciesValues.add("Zebra fish");
+//			speciesValues.add("Fruit fly");
+//			speciesValues.add("Worm");
+//			speciesValues.add("Yeast");
 
 			// dynamically populate list of datasource names
-			populateDataSourceList();
+			//populateDataSourceList();
 
 			layoutProperties = new LayoutProperties(getName());
 			layoutProperties.add(new Tunable("global", "Global Settings",
@@ -133,21 +126,21 @@ public class GOLayout extends CytoscapePlugin {
 					PartitionNetworkVisualStyleFactory.attributeName,
 					(Object) getInitialAttributeList(MF_ATTNAME),
 					(Object) null, 0));
-			layoutProperties.add(new Tunable("annotation",
-					"Annotation Settings (optional)", Tunable.GROUP, new Integer(3)));
-			layoutProperties.add(new Tunable("attributeAnnotation",
-					"The identifier to use for annotation retrieval",
-					Tunable.NODEATTRIBUTE, annotationAtt,
-					(Object) getInitialAttributeList(null), (Object) null, 0));
-			Tunable t = new Tunable("speciesAnnotation", "Species of identifier",
-					Tunable.LIST, new Integer(0), (Object) speciesValues
-							.toArray(), null, 0);
-			t.addTunableValueListener(this);
-			layoutProperties.add(t);
-			dsTunable = new Tunable("dsAnnotation",
-					"Type of identifier, e.g., Entrez Gene", Tunable.LIST,
-					new Integer(0), (Object) dsValues.toArray(), null, 0);
-			layoutProperties.add(dsTunable);
+//			layoutProperties.add(new Tunable("annotation",
+//					"Annotation Settings (optional)", Tunable.GROUP, new Integer(3)));
+//			layoutProperties.add(new Tunable("attributeAnnotation",
+//					"The identifier to use for annotation retrieval",
+//					Tunable.NODEATTRIBUTE, annotationAtt,
+//					(Object) getInitialAttributeList(null), (Object) null, 0));
+//			Tunable t = new Tunable("speciesAnnotation", "Species of identifier",
+//					Tunable.LIST, new Integer(0), (Object) speciesValues
+//							.toArray(), null, 0);
+//			t.addTunableValueListener(this);
+//			layoutProperties.add(t);
+//			dsTunable = new Tunable("dsAnnotation",
+//					"Type of identifier, e.g., Entrez Gene", Tunable.LIST,
+//					new Integer(0), (Object) dsValues.toArray(), null, 0);
+//			layoutProperties.add(dsTunable);
 			layoutProperties.add(new Tunable("partition", "Partition Settings",
 					Tunable.GROUP, new Integer(2)));
 			layoutProperties.add(new Tunable("partitionMin",
@@ -185,48 +178,48 @@ public class GOLayout extends CytoscapePlugin {
 
 		}
 
-		public void populateDataSourceList() {
-			try {
-				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
-			} catch (ClassNotFoundException e) {
-				System.out
-						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
-				e.printStackTrace();
-			}
-
-			BioDataSource.init();
-			// now we connect to the driver and create a IDMapper instance.
-			// TODO: Update to use multiple species
-			try {
-				_mapper = BridgeDb
-						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
-								+ annotationSpecies);
-			} catch (IDMapperException e) {
-				e.printStackTrace();
-			}
-			try {
-				dataSources = _mapper.getCapabilities()
-						.getSupportedSrcDataSources();
-			} catch (IDMapperException e) {
-				e.printStackTrace();
-			}
-			dsValues.clear();
-			if (dataSources.size() > 0) {
-				Iterator it = dataSources.iterator();
-				while (it.hasNext()) {
-					dsValues.add(((DataSource) it.next()).getFullName());
-				}
-
-			}
-
-		}
+//		public void populateDataSourceList() {
+//			try {
+//				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
+//			} catch (ClassNotFoundException e) {
+//				System.out
+//						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
+//				e.printStackTrace();
+//			}
+//
+//			BioDataSource.init();
+//			// now we connect to the driver and create a IDMapper instance.
+//			// TODO: Update to use multiple species
+//			try {
+//				_mapper = BridgeDb
+//						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
+//								+ annotationSpecies);
+//			} catch (IDMapperException e) {
+//				e.printStackTrace();
+//			}
+//			try {
+//				dataSources = _mapper.getCapabilities()
+//						.getSupportedSrcDataSources();
+//			} catch (IDMapperException e) {
+//				e.printStackTrace();
+//			}
+//			dsValues.clear();
+//			if (dataSources.size() > 0) {
+//				Iterator it = dataSources.iterator();
+//				while (it.hasNext()) {
+//					dsValues.add(((DataSource) it.next()).getFullName());
+//				}
+//
+//			}
+//
+//		}
 
 		public void tunableChanged(Tunable t) {
 			// TODO Auto-generated method stub
 			if (t.getName().equals("speciesAnnotation")) {
 				updateSettings();
-				populateDataSourceList(); // refresh list
-				dsTunable.setLowerBound(dsValues.toArray()); // and reset
+//				populateDataSourceList(); // refresh list
+//				dsTunable.setLowerBound(dsValues.toArray()); // and reset
 																// tunable
 			}
 		}
@@ -276,23 +269,23 @@ public class GOLayout extends CytoscapePlugin {
 				}
 			}
 
-			t = layoutProperties.get("attributeAnnotation");
-			if ((t != null) && (t.valueChanged() || force)) {
-				String newValue = (String) t.getValue();
-				annotationAtt = newValue;
-			}
+//			t = layoutProperties.get("attributeAnnotation");
+//			if ((t != null) && (t.valueChanged() || force)) {
+//				String newValue = (String) t.getValue();
+//				annotationAtt = newValue;
+//			}
 
-			t = layoutProperties.get("speciesAnnotation");
-			if ((t != null) && (t.valueChanged() || force)) {
-				String newValue = speciesValues.get((Integer) t.getValue());
-				annotationSpecies = newValue;
-			}
-
-			t = layoutProperties.get("dsAnnotation");
-			if ((t != null) && (t.valueChanged() || force)) {
-				String newValue = dsValues.get((Integer) t.getValue());
-				annotationCode = newValue;
-			}
+//			t = layoutProperties.get("speciesAnnotation");
+//			if ((t != null) && (t.valueChanged() || force)) {
+//				String newValue = speciesValues.get((Integer) t.getValue());
+//				annotationSpecies = newValue;
+//			}
+//
+//			t = layoutProperties.get("dsAnnotation");
+//			if ((t != null) && (t.valueChanged() || force)) {
+//				String newValue = dsValues.get((Integer) t.getValue());
+//				annotationCode = newValue;
+//			}
 
 			t = layoutProperties.get("partitionMin");
 			if ((t != null) && (t.valueChanged() || force))
@@ -435,19 +428,19 @@ public class GOLayout extends CytoscapePlugin {
 				}
 			}
 			// Fetch annotations if they are needed
-			if (CC_ATTNAME == CellAlgorithm.attributeName && !ccPresent) {
-				setupBridgeDB(CC_CODE, CC_ATTNAME, annotationAtt,
-						annotationCode, annotationSpecies);
-			}
-			if (BP_ATTNAME == PartitionAlgorithm.attributeName && !bpPresent) {
-				setupBridgeDB(BP_CODE, BP_ATTNAME, annotationAtt,
-						annotationCode, annotationSpecies);
-			}
-			if (MF_ATTNAME == PartitionNetworkVisualStyleFactory.attributeName
-					&& !mfPresent) {
-				setupBridgeDB(MF_CODE, MF_ATTNAME, annotationAtt,
-						annotationCode, annotationSpecies);
-			}
+//			if (CC_ATTNAME == CellAlgorithm.attributeName && !ccPresent) {
+//				setupBridgeDB(CC_CODE, CC_ATTNAME, annotationAtt,
+//						annotationCode, annotationSpecies);
+//			}
+//			if (BP_ATTNAME == PartitionAlgorithm.attributeName && !bpPresent) {
+//				setupBridgeDB(BP_CODE, BP_ATTNAME, annotationAtt,
+//						annotationCode, annotationSpecies);
+//			}
+//			if (MF_ATTNAME == PartitionNetworkVisualStyleFactory.attributeName
+//					&& !mfPresent) {
+//				setupBridgeDB(MF_CODE, MF_ATTNAME, annotationAtt,
+//						annotationCode, annotationSpecies);
+//			}
 
 			if (null != CellAlgorithm.attributeName) {
 				PartitionAlgorithm.layoutName = CellAlgorithm.LAYOUT_NAME;
@@ -466,71 +459,71 @@ public class GOLayout extends CytoscapePlugin {
 		 * @param annCode
 		 * @param annSpecies
 		 */
-		public void setupBridgeDB(String code, String attname, String annAtt,
-				String annCode, String annSpecies) {
-
-			DataSource annDs = DataSource.getByFullName(annCode);
-
-			try {
-				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
-			} catch (ClassNotFoundException e) {
-				System.out
-						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
-				e.printStackTrace();
-			}
-
-			BioDataSource.init();
-			// now we connect to the driver and create a IDMapper instance.
-			// TODO: Update to use multiple species
-			try {
-				_mapper = BridgeDb
-						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
-								+ annSpecies);
-			} catch (IDMapperException e) {
-				e.printStackTrace();
-			}
-			System.out.println("ID Mapper = " + _mapper);
-			System.out.println("ID Mapper capabilites = "
-					+ _mapper.getCapabilities());
-
-			CyAttributes attrs = Cytoscape.getNodeAttributes();
-			Xref inXref = null;
-
-			Iterator<Node> it = Cytoscape.getCurrentNetwork().nodesIterator();
-			while (it.hasNext()) {
-				Node n = it.next();
-				String inputID = (String) Cytoscape.getNodeAttributes()
-						.getAttribute(n.getIdentifier(), annAtt);
-				if (null == inputID) {
-					continue;
-				}
-				if ("Sym" == annCode && "Human" == annSpecies){
-					inputID = inputID.toUpperCase();
-				}
-
-				inXref = new Xref(inputID, annDs);
-
-				Set<Xref> outXrefs = null;
-				try {
-					outXrefs = _mapper.mapID(inXref, DataSource
-							.getBySystemCode(code));
-				} catch (IDMapperException e) {
-					System.out
-							.println("Got ID mapper exception trying to get mappings");
-				}
-				System.out.println("Got mappings: " + outXrefs);
-				if (outXrefs != null) {
-					List<String> att = new ArrayList<String>();
-					for (Xref xref : outXrefs) {
-						att.add(xref.getId());
-					}
-					Cytoscape.getNodeAttributes().setListAttribute(
-							n.getIdentifier(), attname, att);
-				}
-
-			}
-		}
-
+//		public void setupBridgeDB(String code, String attname, String annAtt,
+//				String annCode, String annSpecies) {
+//
+//			DataSource annDs = DataSource.getByFullName(annCode);
+//
+//			try {
+//				Class.forName("org.bridgedb.webservice.bridgerest.BridgeRest");
+//			} catch (ClassNotFoundException e) {
+//				System.out
+//						.println("Can't register org.bridgedb.rdb.IDMapperRdb");
+//				e.printStackTrace();
+//			}
+//
+//			BioDataSource.init();
+//			// now we connect to the driver and create a IDMapper instance.
+//			// TODO: Update to use multiple species
+//			try {
+//				_mapper = BridgeDb
+//						.connect("idmapper-bridgerest:http://webservice.bridgedb.org/"
+//								+ annSpecies);
+//			} catch (IDMapperException e) {
+//				e.printStackTrace();
+//			}
+//			System.out.println("ID Mapper = " + _mapper);
+//			System.out.println("ID Mapper capabilites = "
+//					+ _mapper.getCapabilities());
+//
+//			CyAttributes attrs = Cytoscape.getNodeAttributes();
+//			Xref inXref = null;
+//
+//			Iterator<Node> it = Cytoscape.getCurrentNetwork().nodesIterator();
+//			while (it.hasNext()) {
+//				Node n = it.next();
+//				String inputID = (String) Cytoscape.getNodeAttributes()
+//						.getAttribute(n.getIdentifier(), annAtt);
+//				if (null == inputID) {
+//					continue;
+//				}
+//				if ("Sym" == annCode && "Human" == annSpecies){
+//					inputID = inputID.toUpperCase();
+//				}
+//
+//				inXref = new Xref(inputID, annDs);
+//
+//				Set<Xref> outXrefs = null;
+//				try {
+//					outXrefs = _mapper.mapID(inXref, DataSource
+//							.getBySystemCode(code));
+//				} catch (IDMapperException e) {
+//					System.out
+//							.println("Got ID mapper exception trying to get mappings");
+//				}
+//				System.out.println("Got mappings: " + outXrefs);
+//				if (outXrefs != null) {
+//					List<String> att = new ArrayList<String>();
+//					for (Xref xref : outXrefs) {
+//						att.add(xref.getId());
+//					}
+//					Cytoscape.getNodeAttributes().setListAttribute(
+//							n.getIdentifier(), attname, att);
+//				}
+//
+//			}
+//		}
+//
 	}
 }
 

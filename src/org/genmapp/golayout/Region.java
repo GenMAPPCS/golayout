@@ -36,7 +36,7 @@ import java.util.List;
 
 import javax.swing.JComponent;
 
-import org.pathvisio.view.ShapeRegistry;
+//import org.pathvisio.view.ShapeRegistry;
 
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
@@ -83,7 +83,7 @@ public class Region extends JComponent implements ViewportChangeListener {
 	// graphics
 	protected DGraphView dview = (DGraphView) Cytoscape.getCurrentNetworkView();
 	private static final int OPACITY_LEVEL = (int) (255 * 1);
-	
+
 	public Region(String shape, String fillcolor, String color, double centerX,
 			double centerY, double width, double height, int zorder,
 			double rotation, String attValue) {
@@ -115,10 +115,11 @@ public class Region extends JComponent implements ViewportChangeListener {
 		RegionManager.addRegion(this.attValue, this);
 
 		// synonym terms based on Nathan's GO tree analysis
-		//TODO: this should all be in a lexicon file
+		// TODO: this should all be in a lexicon file
 		if (this.attValue.equals("extracellular region"))
 			nestedAttValues = Arrays.asList("extracellular region",
-					"extracellular space", "secreted", "cytoskeleton", "extracellular");
+					"extracellular space", "secreted", "cytoskeleton",
+					"extracellular");
 		else if (this.attValue.equals("mitochondrion"))
 			nestedAttValues = Arrays.asList("mitochondrion",
 					"mitochondrion lumen");
@@ -126,7 +127,8 @@ public class Region extends JComponent implements ViewportChangeListener {
 			nestedAttValues = Arrays.asList("endoplasmic reticulum",
 					"Golgi apparatus");
 		else if (this.attValue.equals("plasma membrane"))
-			nestedAttValues = Arrays.asList("plasma membrane", "cell wall", "membrane");
+			nestedAttValues = Arrays.asList("plasma membrane", "cell wall",
+					"membrane");
 		else if (this.attValue.equals("cytoplasm"))
 			nestedAttValues = Arrays.asList("cytoplasm", "intracellular",
 					"cytosol", "vacuole", "lysosome", "peroxisome");
@@ -134,11 +136,12 @@ public class Region extends JComponent implements ViewportChangeListener {
 			nestedAttValues = Arrays.asList("nucleus", "nucleolus",
 					"nuclear membrane", "nucleoplasm");
 		else if (this.attValue.equals("unassigned"))
-			nestedAttValues = Arrays.asList("unassigned", "cellular_component", "cellular component unknown");
+			nestedAttValues = Arrays.asList("unassigned", "cellular_component",
+					"cellular component unknown");
 		else
 			nestedAttValues = Arrays.asList(this.attValue);
 
-		//addition parameters
+		// addition parameters
 		this.nodeViews = CellAlgorithm.populateNodeViews(this);
 		this.nodeCount = this.nodeViews.size();
 		this.columns = (int) Math.sqrt(this.nodeCount);
@@ -152,8 +155,8 @@ public class Region extends JComponent implements ViewportChangeListener {
 				* MFNodeAppearanceCalculator.FEATURE_NODE_WIDTH;
 		this.freeHeight = height - 20
 				* MFNodeAppearanceCalculator.FEATURE_NODE_HEIGHT;
-		
-		if (this.shape == MEMBRANE_LINE){
+
+		if (this.shape == MEMBRANE_LINE) {
 			// further shrink width to leave room for in-line label
 			this.freeCenterX += 300;
 			this.freeWidth -= 600;
@@ -189,7 +192,6 @@ public class Region extends JComponent implements ViewportChangeListener {
 		dview.addViewportChangeListener(this);
 
 	}
-
 
 	// graphics
 	public void setBounds(double x, double y, double width, double height) {
@@ -235,9 +237,9 @@ public class Region extends JComponent implements ViewportChangeListener {
 
 		Rectangle b = outline.getBounds();
 		Point2D pstart = f.transform(new Point2D.Double(b.x, b.y), null);
-		//hack! increase bounds to accommodate layered oval and rect drawing
-		setBounds(pstart.getX() - 1, pstart.getY() - 1, (b.width + 2) * newScaleFactor,
-				(b.height + 2) * newScaleFactor);
+		// hack! increase bounds to accommodate layered oval and rect drawing
+		setBounds(pstart.getX() - 1, pstart.getY() - 1, (b.width + 2)
+				* newScaleFactor, (b.height + 2) * newScaleFactor);
 	}
 
 	public Rectangle2D.Double getVRectangle() {
@@ -280,15 +282,22 @@ public class Region extends JComponent implements ViewportChangeListener {
 			scaledFont = (int) Math.round(scaledFontD);
 		}
 
-		Rectangle b = relativeToBounds(viewportTransform(getVRectangle()))
-				.getBounds();
+		// Note: the "20" is just a function of font character height and the "8"
+		// is a function of font character width
+		int scaledLabelOffsetY = (int) Math.round(affineScale * 20);
+		int scaledLabelOffsetX = (int) Math.round(affineScale * (this.width / 2
+				- 8 * this.attValue.length()));
+
+		// Rectangle b =
+		// relativeToBounds(viewportTransform(getVRectangle())).getBounds();
+		Rectangle b = viewportTransform(getVRectangle()).getBounds();
 
 		int x = b.x;
 		int y = b.y;
 		int w = b.width - 2;
 		int h = b.height - 2;
-//		int cx = x + w / 2;
-//		int cy = y + h / 2;
+		// int cx = x + w / 2;
+		// int cy = y + h / 2;
 		int arcWidth = 25;
 		int arcHeight = 25;
 
@@ -300,76 +309,77 @@ public class Region extends JComponent implements ViewportChangeListener {
 			float scaledWidth = (float) scaledWidthD;
 
 			g2d.setColor(this.color);
-			float dash[] = { 10.0f };
+			float dash[] = {10.0f};
 			g2d.setStroke(new BasicStroke(scaledWidth, BasicStroke.CAP_BUTT,
 					BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
 			g2d.drawLine((int) src.getX(), (int) src.getY(), (int) trgt.getX(),
 					(int) trgt.getY());
 
-			double scaledOffsetD = affineScale * 30;
-			int scaledOffset = 1;
-			if (scaledOffsetD > 0.5) {
-				scaledOffset = (int) Math.round(scaledOffsetD);
-			}
+			// double scaledOffsetD = affineScale * 30;
+			// int scaledOffset = 1;
+			// if (scaledOffsetD > 0.5) {
+			// scaledOffset = (int) Math.round(scaledOffsetD);
+			// }
 
 			g2d.setColor(Color.black);
 			Font font = new Font("Serif", Font.BOLD, scaledFont);
 			g2d.setFont(font);
-			g2d.drawString(this.attValue, scaledOffset, scaledOffset);
+			g2d.drawString(this.attValue, x, y + scaledLabelOffsetY);
 		} else if (this.shape == MEMBRANE_LINE) {
-//			Point2D src = new Point2D.Double(x, y);
-//			Point2D trgt = new Point2D.Double(x + w, y);
-//
-//			Point2D src2 = new Point2D.Double(x, y + h);
-//			Point2D trgt2 = new Point2D.Double(x + w, y + h);
+			// Point2D src = new Point2D.Double(x, y);
+			// Point2D trgt = new Point2D.Double(x + w, y);
+			//
+			// Point2D src2 = new Point2D.Double(x, y + h);
+			// Point2D trgt2 = new Point2D.Double(x + w, y + h);
 
-//			double scaledHeightD = affineScale * 6;
-//			float scaledHeight = (float) scaledHeightD;
-			
+			// double scaledHeightD = affineScale * 6;
+			// float scaledHeight = (float) scaledHeightD;
+
 			g2d.setColor(this.fillcolor);
-			g2d.fillRoundRect(x, y, w , h, h, h);
-//			g2d.fillRoundRect(x, y + h, w , h, h, h);
+			g2d.fillRoundRect(x, y, w, h, h, h);
+			// g2d.fillRoundRect(x, y + h, w , h, h, h);
 			// outline rect
 			g2d.setColor(this.color);
 			g2d.setStroke(new BasicStroke(0.3f));
-			g2d.drawRoundRect(x, y, w , h, h, h);
-//			g2d.drawRoundRect(x, y + h, w , h, h, h);
+			g2d.drawRoundRect(x, y, w, h, h, h);
+			// g2d.drawRoundRect(x, y + h, w , h, h, h);
 
-//			double scaledWidthD = affineScale * 10;
-//			float scaledWidth = (float) scaledWidthD;
-//
-//			g2d.setStroke(new BasicStroke(scaledWidth, BasicStroke.CAP_BUTT,
-//					BasicStroke.JOIN_MITER, 10.0f, null, 0.0f));
-//			g2d.drawLine((int) src.getX(), (int) src.getY(), (int) trgt.getX(),
-//					(int) trgt.getY());
-//			g2d.drawLine((int) src2.getX(), (int) src2.getY(), (int) trgt2
-//					.getX(), (int) trgt2.getY());
+			// double scaledWidthD = affineScale * 10;
+			// float scaledWidth = (float) scaledWidthD;
+			//
+			// g2d.setStroke(new BasicStroke(scaledWidth, BasicStroke.CAP_BUTT,
+			// BasicStroke.JOIN_MITER, 10.0f, null, 0.0f));
+			// g2d.drawLine((int) src.getX(), (int) src.getY(), (int)
+			// trgt.getX(),
+			// (int) trgt.getY());
+			// g2d.drawLine((int) src2.getX(), (int) src2.getY(), (int) trgt2
+			// .getX(), (int) trgt2.getY());
 
-			double scaledOffsetXD = affineScale * 30;
-			int scaledOffsetX = 1;
-			if (scaledOffsetXD > 0.5) {
-				scaledOffsetX = (int) Math.round(scaledOffsetXD);
-			}
-			double scaledOffsetYD = affineScale * 20;
-			int scaledOffsetY = 1;
-			if (scaledOffsetYD > 0.5) {
-				scaledOffsetY = (int) Math.round(scaledOffsetYD);
-			}
+			// double scaledOffsetXD = affineScale * 30;
+			// int scaledOffsetX = 1;
+			// if (scaledOffsetXD > 0.5) {
+			// scaledOffsetX = (int) Math.round(scaledOffsetXD);
+			// }
+			// double scaledOffsetYD = affineScale * 20;
+			// int scaledOffsetY = 1;
+			// if (scaledOffsetYD > 0.5) {
+			// scaledOffsetY = (int) Math.round(scaledOffsetYD);
+			// }
 
 			g2d.setColor(Color.black);
 			Font font = new Font("Serif", Font.BOLD, scaledFont);
 			g2d.setFont(font);
-			g2d.drawString(this.attValue, scaledOffsetX, scaledOffsetY);
+			g2d.drawString(this.attValue, x, y+ scaledLabelOffsetY);
 
 		} else if (this.shape == COMPARTMENT_RECT) {
-//			java.awt.Shape s = null;
-//
-//			// Note restricted syntax for shape (e.g., "Rectangle"
-//			s = ShapeRegistry.getShape(this.shape, x, y, w, h);
-//
-//			AffineTransform t = new AffineTransform();
-//			t.rotate(this.rotation, cx, cy);
-//			s = t.createTransformedShape(s);
+			// java.awt.Shape s = null;
+			//
+			// // Note restricted syntax for shape (e.g., "Rectangle"
+			// s = ShapeRegistry.getShape(this.shape, x, y, w, h);
+			//
+			// AffineTransform t = new AffineTransform();
+			// t.rotate(this.rotation, cx, cy);
+			// s = t.createTransformedShape(s);
 
 			if (this.getRegionsOverlapped().size() > 0) {
 				// background "shadow" rect
@@ -382,20 +392,21 @@ public class Region extends JComponent implements ViewportChangeListener {
 				// outline rect
 				g2d.setColor(this.color);
 				g2d.setStroke(new BasicStroke(0.3f));
-				g2d.drawRoundRect(x - 1, y - 1 , w - 1, h - 1, arcWidth, arcHeight);
+				g2d.drawRoundRect(x - 1, y - 1, w - 1, h - 1, arcWidth,
+						arcHeight);
 
 			}
-			
-			double scaledOffsetD = affineScale * 30;
-			int scaledOffset = 1;
-			if (scaledOffsetD > 0.5) {
-				scaledOffset = (int) Math.round(scaledOffsetD);
-			}
+
+			// double scaledOffsetD = affineScale * 30;
+			// int scaledOffset = 1;
+			// if (scaledOffsetD > 0.5) {
+			// scaledOffset = (int) Math.round(scaledOffsetD);
+			// }
 
 			g2d.setColor(Color.black);
 			Font font = new Font("Serif", Font.BOLD, scaledFont);
 			g2d.setFont(font);
-			g2d.drawString(this.attValue, scaledOffset, scaledOffset);
+			g2d.drawString(this.attValue, x, y+ scaledLabelOffsetY);
 
 		} else if (this.shape == Region.COMPARTMENT_OVAL) {
 			// background "shadow" oval
@@ -407,25 +418,26 @@ public class Region extends JComponent implements ViewportChangeListener {
 			// outline oval
 			g2d.setColor(this.color);
 			g2d.setStroke(new BasicStroke(0.3f));
-			g2d.drawOval(x - 1, y - 1 , w - 1, h - 1);
-			
-			// Note: the "8" is a function of font size
-			double scaledOffsetXD = affineScale
-					* (this.width / 2 - 8 * this.attValue.length());
-			int scaledOffsetX = 1;
-			if (scaledOffsetXD > 0.5) {
-				scaledOffsetX = (int) Math.round(scaledOffsetXD);
-			}
-			double scaledOffsetYD = affineScale * 40;
-			int scaledOffsetY = 1;
-			if (scaledOffsetYD > 0.5) {
-				scaledOffsetY = (int) Math.round(scaledOffsetYD);
-			}
+			g2d.drawOval(x - 1, y - 1, w - 1, h - 1);
+
+			// // Note: the "8" is a function of font size
+			// double scaledOffsetXD = affineScale
+			// * (this.width / 2 - 8 * this.attValue.length());
+			// int scaledOffsetX = 1;
+			// if (scaledOffsetXD > 0.5) {
+			// scaledOffsetX = (int) Math.round(scaledOffsetXD);
+			// }
+			// double scaledOffsetYD = affineScale * 40;
+			// int scaledOffsetY = 1;
+			// if (scaledOffsetYD > 0.5) {
+			// scaledOffsetY = (int) Math.round(scaledOffsetYD);
+			// }
 
 			g2d.setColor(Color.black);
 			Font font = new Font("Serif", Font.BOLD, scaledFont);
 			g2d.setFont(font);
-			g2d.drawString(this.attValue, scaledOffsetX, scaledOffsetY);
+			// Note: the "8" is a function of font size
+			g2d.drawString(this.attValue, x + scaledLabelOffsetX, y + scaledLabelOffsetY);
 		} else {
 
 			// do nothing
@@ -447,7 +459,8 @@ public class Region extends JComponent implements ViewportChangeListener {
 		double bufferY = MFNodeAppearanceCalculator.FEATURE_NODE_HEIGHT;
 
 		/*
-		 * first calculate the min/max x and y for the list ofrelevant nodeviews
+		 * first calculate the min/max x and y for the list of relevant
+		 * nodeviews
 		 */
 		Iterator<NodeView> it = nodeViews.iterator();
 		while (it.hasNext()) {
@@ -495,7 +508,6 @@ public class Region extends JComponent implements ViewportChangeListener {
 	public List<String> getNestedAttValues() {
 		return nestedAttValues;
 	}
-
 
 	/**
 	 * @return the visibleBorder
