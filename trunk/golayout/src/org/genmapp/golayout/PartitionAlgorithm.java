@@ -276,13 +276,15 @@ public class PartitionAlgorithm extends AbstractLayout implements
 			CyNode node = it.next();
 
 			// assign unconnected nodes to a special category and move on
-			int[] edges = Cytoscape.getCurrentNetwork()
-					.getAdjacentEdgeIndicesArray(node.getRootGraphIndex(),
-							true, true, true);
-			if (edges.length <= 0) {
-				unconnectedNodes.add(node);
-				continue;
-			}
+			//AP: buggy for networks without edges
+			//AP: why is this needed, anyways?
+//			int[] edges = Cytoscape.getCurrentNetwork()
+//					.getAdjacentEdgeIndicesArray(node.getRootGraphIndex(),
+//							true, true, true);
+//			if (edges.length <= 0) {
+//				unconnectedNodes.add(node);
+//				continue;
+//			}
 
 			String val = null;
 			String terms[] = new String[1];
@@ -378,6 +380,8 @@ public class PartitionAlgorithm extends AbstractLayout implements
 			return;
 		}
 
+		//System.out.println("SIZE: " +attributeValue +": "+ nodes.size());
+		
 		CyNetwork new_network = Cytoscape.createNetwork(nodes, current_network
 				.getConnectingEdges(new ArrayList(nodes)),
 		// CyNetworkNaming.getSuggestedSubnetworkTitle(current_network),
@@ -496,8 +500,9 @@ public class PartitionAlgorithm extends AbstractLayout implements
 					// if a non-null attribute has been selection for node
 					// coloring
 					// and if not running Floorplan Only
-					GOLayout.createVisualStyle(Cytoscape
-							.getCurrentNetworkView());
+					//AP: buggy
+//					GOLayout.createVisualStyle(Cytoscape
+//							.getCurrentNetworkView());
 				}
 
 				Set<Object> attributeValues = attributeValueNodeMap.keySet();
@@ -507,8 +512,7 @@ public class PartitionAlgorithm extends AbstractLayout implements
 
 				int nbrProcesses = attributeValues.size();
 				int count = 0;
-
-				//		
+	
 				for (Object val : attributeValues) {
 					count++;
 					taskMonitor.setPercentCompleted((100 * count)

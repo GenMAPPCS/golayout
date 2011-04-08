@@ -112,18 +112,17 @@ public class GOLayout extends CytoscapePlugin {
 					Tunable.GROUP, new Integer(3)));
 			layoutProperties.add(new Tunable("attributePartition",
 					"The attribute to use for partitioning",
-					Tunable.NODEATTRIBUTE, PartitionAlgorithm.attributeName,
+					Tunable.NODEATTRIBUTE, BP_ATTNAME,
 					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeLayout",
 					"The attribute to use for the layout",
-					Tunable.NODEATTRIBUTE, CellAlgorithm.attributeName,
+					Tunable.NODEATTRIBUTE, CC_ATTNAME,
 					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 			layoutProperties.add(new Tunable("attributeNodeColor",
 					"The attribute to use for node color",
-					Tunable.NODEATTRIBUTE,
-					PartitionNetworkVisualStyleFactory.attributeName,
+					Tunable.NODEATTRIBUTE, MF_ATTNAME,
 					(Object) getInitialAttributeList(),
 					(Object) null, 0));
 //			layoutProperties.add(new Tunable("annotation",
