@@ -168,7 +168,7 @@ public class GOLayout extends CytoscapePlugin {
                     layoutProperties.add(new Tunable("layout", "Layout Settings",
                             Tunable.GROUP, new Integer(2)));
                     lPreTemTunable = new Tunable("presetTemplete",
-                            "Choose on templete from",
+                            "Choose one templete from",
                             Tunable.INTEGER, PartitionAlgorithm.NETWORK_LIMIT_MIN);
                     layoutProperties.add(lPreTemTunable);
                     lLoaTemTunable = new Tunable("uploadTemplete",
